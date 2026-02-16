@@ -1,4 +1,3 @@
-# اسم الملف: app.py
 from flask import Flask, request, send_file, render_template_string
 from video_engine import process_video
 import os
@@ -41,11 +40,11 @@ def generate():
         try:
             return send_file(video_path, as_attachment=True, download_name="final_video.mp4")
         finally:
-            # حذف الفيديو بعد إرساله لتوفير المساحة (اختياري)
-            # if os.path.exists(video_path): os.remove(video_path)
+            # تم الإبقاء على الحذف معلقاً كما في طلبك
             pass
     else:
         return f"Error: {error}", 500
 
 if __name__ == '__main__':
+    # Gunicorn سيقوم بتجاوز هذا السطر، لكنه مفيد للتجربة المحلية
     app.run(host='0.0.0.0', port=5000)

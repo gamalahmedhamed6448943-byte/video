@@ -1,5 +1,3 @@
-# اسم الملف: video_engine.py
-
 import os
 import requests
 from bs4 import BeautifulSoup
@@ -32,7 +30,7 @@ try:
 except:
     pass
 
-# --- الدوال المساعدة (نفس دوالك الأصلية مع تعديلات بسيطة للإرجاع بدل العرض) ---
+# --- الدوال المساعدة ---
 
 def generate_long_audio(text, lang='en', output_file='audio.mp3'):
     text = text.replace('"', '').replace("'", "").strip()
@@ -77,7 +75,6 @@ def generate_long_audio(text, lang='en', output_file='audio.mp3'):
     return False
 
 def get_best_image_url(img_tag, base_url):
-    # (نفس الكود الأصلي الخاص بك)
     srcset = img_tag.get('srcset') or img_tag.get('data-srcset')
     if srcset:
         try:
@@ -85,7 +82,7 @@ def get_best_image_url(img_tag, base_url):
             for entry in srcset.split(','):
                 parts = entry.strip().split()
                 if len(parts) >= 1:
-                    candidates.append((0, parts[0])) # تبسيط للكود
+                    candidates.append((0, parts[0]))
             if candidates: return urljoin(base_url, candidates[0][1])
         except: pass
     src = img_tag.get('src') or img_tag.get('data-src')
@@ -100,7 +97,6 @@ def extract_content(url):
         
         for t in soup(['script', 'style', 'svg', 'footer', 'nav']): t.decompose()
         
-        # استخراج العنوان والنص
         title = "News Video"
         h1 = soup.find('h1')
         if h1: title = h1.get_text(strip=True)
@@ -113,7 +109,6 @@ def extract_content(url):
         text_parts = [p.get_text(strip=True) for p in paragraphs if len(p.get_text(strip=True)) > 30]
         full_text = ". ".join(text_parts)
 
-        # استخراج الصور
         imgs = target.find_all('img')
         images = []
         seen = set()
@@ -129,7 +124,6 @@ def extract_content(url):
         return None, None, []
 
 def create_styled_clip(img_path, duration, screen_size=(1280, 720)):
-    # (نفس الدالة الأصلية)
     try:
         pil_img = Image.open(img_path).convert('RGB')
         bg_img = pil_img.resize(screen_size, Image.LANCZOS)
@@ -169,7 +163,7 @@ def process_video(url):
     downloaded_imgs = []
     try:
         if images:
-            clip_duration = max(3, total_duration / len(images)) # لا تقل عن 3 ثواني
+            clip_duration = max(3, total_duration / len(images))
             needed = int(total_duration / clip_duration) + 1
             images = images[:needed]
             
@@ -199,7 +193,6 @@ def process_video(url):
         final_clip = final_clip.set_audio(audio_clip)
         final_clip.write_videofile(video_filename, fps=1, codec="libx264", audio_codec="aac", preset="ultrafast", logger=None)
         
-        # تنظيف
         audio_clip.close()
         final_clip.close()
         if os.path.exists(audio_filename): os.remove(audio_filename)
